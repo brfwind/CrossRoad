@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Border
+  - Obstacle
+  - BackGround
+  - Car
+  - Wood
+  - Water
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - WoodLayer
+  - Water
+  - UI
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Back
+    uniqueID: 2945309465
+    locked: 0
+  - name: Middle
+    uniqueID: 2319013603
+    locked: 0
+  - name: Front
+    uniqueID: 760825635
+    locked: 0
