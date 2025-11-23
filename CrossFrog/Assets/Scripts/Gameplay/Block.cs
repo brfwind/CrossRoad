@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Block : MonoBehaviour
 {
+    #region 自动生成的场景销毁逻辑
     void Update()
     {
         CheckPosition();
@@ -15,4 +16,5 @@ public class Block : MonoBehaviour
             Destroy(this.gameObject);
         }
     }
+    #endregion
 }

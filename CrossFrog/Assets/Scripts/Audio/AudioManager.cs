@@ -19,6 +19,7 @@ public class AudioManager : MonoBehaviour
     public AudioSource bgmMusic;
     public AudioSource fx;
 
+    #region 单例模式、播放主bgm
     private void Awake()
     {
         if (instance == null)
@@ -28,10 +29,13 @@ public class AudioManager : MonoBehaviour
 
         DontDestroyOnLoad(this);
 
+        //指定主bgm，以及播放主bgm
         bgmMusic.clip = bgmClip;
         PlayMusic();
     }
+    #endregion
 
+    #region 事件系统
     private void OnEnable()
     {
         EventHandler.GameOverEvent += OnGameOverEvent;
@@ -42,12 +46,15 @@ public class AudioManager : MonoBehaviour
         EventHandler.GameOverEvent -= OnGameOverEvent;
     }
 
+    //游戏结束时，播放死亡音效
     private void OnGameOverEvent()
     {
         fx.clip = deadClip;
         fx.Play();
     }
+    #endregion
 
+    #region 根据大小跳，切换跳跃音效
     /// <summary>
     /// 设置跳跃的音效片段
     /// </summary>
@@ -64,7 +71,9 @@ public class AudioManager : MonoBehaviour
                 break;
         }
     }
+    #endregion
 
+    #region 播放主bgm、音效
     public void PlayJumpFx()
     {
         fx.Play();
@@ -77,7 +86,9 @@ public class AudioManager : MonoBehaviour
             bgmMusic.Play();
         }
     }
+    #endregion
 
+    #region 音乐开关按键
     public void ToggleAudio(bool show)
     {
         if (show)
@@ -89,4 +100,5 @@ public class AudioManager : MonoBehaviour
             mixer.SetFloat("masterVolume", -80);
         }
     }
+    #endregion
 }

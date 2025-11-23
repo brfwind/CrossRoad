@@ -34,7 +34,8 @@ public class PlayerController : MonoBehaviour
     private bool isDead;
     private RaycastHit2D[] result = new RaycastHit2D[2];
 
-    #region 周期函数
+    #region 周期函数:获取组件、修改青蛙位置、检测bool更新状态
+    //获取各个组件
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -44,11 +45,14 @@ public class PlayerController : MonoBehaviour
         coll = GetComponent<BoxCollider2D>();
     }
 
+    //丝滑修改青蛙位置
     private void FixedUpdate()
     {
         rb.position = Vector2.Lerp(transform.position, destination, 0.134f);
     }
 
+    //死亡后，关闭输入
+    //可跳跃情况下，通过TruggerJump()完成起跳阶段的各种逻辑
     private void Update()
     {
         if (isDead)
@@ -58,17 +62,23 @@ public class PlayerController : MonoBehaviour
         }
 
         if (canJump)
-            {
-                TriggerJump();
-                canJump = false;
-            }
+        {
+            TriggerJump();
+            canJump = false;
+        }
     }
 
+    //关闭用户输入（死亡后）
+    private void DisableInput()
+    {
+        playerInput.enabled = false;
+    }
     #endregion
 
     #region 碰撞箱Trigger判断
     void OnTriggerStay2D(Collider2D other)
     {
+        //检测河流，区分河流和木板
         if (other.CompareTag("Water") && !isJump)
         {
             Physics2D.RaycastNonAlloc(transform.position + Vector3.up * 0.1f, Vector2.down, result);
@@ -101,6 +111,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        //其他碰撞的检测及执行
         if (other.CompareTag("Border") || other.CompareTag("Car"))
         {
             Debug.Log("GAME OVER!");
@@ -119,6 +130,9 @@ public class PlayerController : MonoBehaviour
             coll.enabled = false;
         }
     }
+    #endregion
+
+    #region 解决青蛙遮挡高物体的bug,检测
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("BackGround"))
@@ -134,22 +148,22 @@ public class PlayerController : MonoBehaviour
             isBackGround = false;
         }
     }
-
     #endregion
 
-    #region 按键事件
+    #region 各种跳跃按键及其对应逻辑
     public void Jump(InputAction.CallbackContext context)
     {
-        //TODO:播放跳跃音效
+        //条件满足时
+        //得到跳跃距离、更新可跳跃状态、播放跳跃音效
         if (context.performed && !isJump)
         {
-            // Debug.Log("JUMP!" + " " + moveDistance);//会在控制台打印
             moveDistance = jumpDistance;
             canJump = true;
 
             AudioManager.instance.SetJumpClip(0);
         }
 
+        //加分逻辑
         if (dir == Direction.Up && context.performed && !isJump)
         {
             pointResult += stepPoint;
@@ -168,7 +182,6 @@ public class PlayerController : MonoBehaviour
 
         if (context.canceled && buttonHeld && !isJump)
         {
-            // Debug.Log("LONG JUMP!" + " " + moveDistance);
             if (dir == Direction.Up)
                 pointResult += stepPoint * 2;
 
@@ -177,13 +190,15 @@ public class PlayerController : MonoBehaviour
         }
 
     }
+    #endregion
 
+    #region 触摸屏的功能实现
     public void GetTouchPosition(InputAction.CallbackContext context)
     {
         if (context.performed)
         {
             touchPosition = Camera.main.ScreenToWorldPoint(context.ReadValue<Vector2>());
-            // Debug.Log(touchPosition);
+
             var offset = ((Vector3)touchPosition - new Vector3(0, transform.position.y, transform.position.z)).normalized;
 
             if (Mathf.Abs(offset.x) <= 0.6f)
@@ -200,7 +215,9 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+    #endregion
 
+    #region 指定移动方向
     public void MoveLeft(InputAction.CallbackContext context)
     {
         if (context.performed && !isJump)
@@ -224,9 +241,9 @@ public class PlayerController : MonoBehaviour
             dir = Direction.Up;
         }
     }
-
     #endregion
 
+    #region 触发跳跃后，动画、移动向量、青蛙贴图朝向处理逻辑
     /// <summary>
     /// 触发执行跳跃动画
     /// </summary>
@@ -252,19 +269,22 @@ public class PlayerController : MonoBehaviour
                 break;
         }
     }
+    #endregion
 
-    #region 动画事件
+    #region 动画开始和结束帧，更新逻辑
     public void JumpAnimationEvent()
     {
         AudioManager.instance.PlayJumpFx();
 
         isJump = true;
 
+        //解决青蛙遮挡高物体的bug
         if (!isBackGround)
         {
             sr.sortingOrder = 1;
         }
 
+        //让青蛙摆脱木板
         transform.parent = null;
     }
 
@@ -275,14 +295,10 @@ public class PlayerController : MonoBehaviour
 
         if (dir == Direction.Up && !isDead)
         {
+            //委托事件
             EventHandler.CallGetPointEvent(pointResult);
         }
     }
 
     #endregion
-
-    private void DisableInput()
-    {
-        playerInput.enabled = false;
-    }
 }

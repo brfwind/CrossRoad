@@ -12,6 +12,7 @@ public class UIManager : MonoBehaviour
     public GameObject leaderboardPanel;
     public GameObject controlPanel;
 
+    #region 事件系统 
     private void OnEnable()
     {
         Time.timeScale = 1;
@@ -28,28 +29,24 @@ public class UIManager : MonoBehaviour
 
     private void OnGetPointEvent(int Point)
     {
+        //让游玩时显示的分数Text等于当前分数
         scoreText.text = Point.ToString();
     }
 
     private void OnGameOverEvent()
     {
+        //GameOver后，显示游戏结束面板
         gameOverPanel.SetActive(true);
 
+        //时间停止流逝
         if (gameOverPanel.activeInHierarchy)
         {
             Time.timeScale = 0;
         }
     }
+    #endregion
 
-    #region 按钮添加方法
-    public void RestartGame()
-    {
-        // SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-
-        gameOverPanel.SetActive(false);
-        TransitionManager.instance.Transition("Gameplay");
-    }
-
+    #region 初始化游玩界面
     private void Start()
     {
         bool show = SettingsManager.instance.showControl;
@@ -57,6 +54,14 @@ public class UIManager : MonoBehaviour
         controlPanel.SetActive(show);
 
         scoreText.text = "00";
+    }
+    #endregion
+
+    #region 给各个按钮添加的方法
+    public void RestartGame()
+    {
+        gameOverPanel.SetActive(false);
+        TransitionManager.instance.Transition("Gameplay");
     }
 
     public void BackToMenu()
@@ -76,6 +81,5 @@ public class UIManager : MonoBehaviour
         leaderboardPanel.SetActive(false);
         gameOverPanel.SetActive(true);
     }
-
-#endregion
+    #endregion
 }
